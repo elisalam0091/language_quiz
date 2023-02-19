@@ -45,10 +45,11 @@ class Converter:
         self.button_frame.grid(row=4)
 
         self.to_celsius_button = Button(self.button_frame,
-                                        text="To Celcius",
+                                        text="To Celsius",
                                         bg="#990099",
                                         fg=button_fg,
-                                        font=button_font, width=12)
+                                        font=button_font, width=12,
+                                        command=self.to_celsius)
         self.to_celsius_button.grid(row=0, column=0, padx=5, pady=5)
 
         self.to_farenheit_button = Button(self.button_frame,
@@ -72,6 +73,27 @@ class Converter:
                                         font=button_font, width=12,
                                         state=DISABLED)
         self.to_history_button.grid(row=1, column=1, padx=5, pady=5)
+
+    def check_temp(min_value):
+        error = "Please enter a number that is more " \
+                "than {}".format(min_value)
+
+        try:
+            response = float(input("Choose a number: "))
+
+            if response < min_value:
+                print(error)
+            else:
+                return response
+
+        except ValueError:
+            print(error)
+
+
+    # checks that temp is more than -459 and converts
+    def to_celsius(self):
+
+        self.check_temp(-459)
 
 
 # main routine
