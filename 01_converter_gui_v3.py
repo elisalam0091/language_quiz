@@ -4,6 +4,15 @@ from tkinter import *
 class Converter:
     def __init__(self):
 
+        # initialise variables (such as feedback)
+        self.var_feedback = StringVar()
+        self.var_feedback.set("")
+
+        self.var_has_error = StringVar()
+        self.var_has_error.set("no")
+
+        self.all_calculations = []
+
         # format for buttons
         # arial size 14 bold, with white text
         button_font = ("Arial", "14", "bold")
@@ -36,9 +45,9 @@ class Converter:
 
         # error message
         error = "please enter a number"
-        self.temp_error = Label(self.temp_frame, text=error,
-                                fg="#9C0000")
-        self.temp_error.grid(row=3)
+        self.output_label = Label(self.temp_frame, text=error,
+                                  fg="#9C0000")
+        self.output_label.grid(row=3)
 
         # convert, help and history / export buttons
         self.button_frame = Frame(self.temp_frame)
@@ -49,15 +58,16 @@ class Converter:
                                         bg="#990099",
                                         fg=button_fg,
                                         font=button_font, width=12,
-                                        command=self.to_celsius)
+                                        command=lambda: self.temp_convert(-459))
         self.to_celsius_button.grid(row=0, column=0, padx=5, pady=5)
 
-        self.to_farenheit_button = Button(self.button_frame,
-                                          text="To Farenheit",
-                                          bg="#009900",
-                                          fg=button_fg,
-                                          font=button_font, width=12)
-        self.to_farenheit_button.grid(row=0, column=1, padx=5, pady=5)
+        self.to_fahrenheit_button = Button(self.button_frame,
+                                           text="To Fahrenheit",
+                                           bg="#009900",
+                                           fg=button_fg,
+                                           font=button_font, width=12,
+                                           command=lambda: self.temp_convert(-273))
+        self.to_fahrenheit_button.grid(row=0, column=1, padx=5, pady=5)
 
         self.to_help_button = Button(self.button_frame,
                                      text="Help / Info",
@@ -78,9 +88,11 @@ class Converter:
         has_error = "no"
         error = "Please enter a number that is more " \
                 "than {}".format(min_value)
+
         # checks user has entered valid number
+        response = self.temp_entry.get()
         try:
-            response = self.temp_entry.get()
+
             response = float(response)
 
             if response < min_value:
@@ -89,22 +101,79 @@ class Converter:
         except ValueError:
             has_error = "yes"
 
-        # if number is invalid, display error msg
+        # set var_has_error so that entry box and labels can be correctly formatted by forming function
         if has_error == "yes":
-            self.temp_error.config(text=error, fg="#9C0000")
+            self.var_has_error.set("yes")
+            self.var_feedback.set(error)
+            return "invalid"
 
+        # if there are no errors
         else:
-            self.temp_error.config(text="You are OK", fg="blue")
 
-            # if there is at least one valid calculation, enable history / export button
+            self.var_has_error.set("no")
+
+            # return number to be converted and enable history button
             self.to_history_button.config(state=NORMAL)
+            return response
 
-
+    @staticmethod
+    def round_ans(val):
+        var_rounded = (val * 2 + 1) // 2
+        return "{:.0f}".format(var_rounded)
 
     # checks that temp is more than -459 and converts
-    def to_celsius(self):
+    def temp_convert(self, min_val):
+        to_convert = self.check_temp(min_val)
+        degree_sign = u'\N{DEGREE SIGN}'
+        set_feedback = "yes"
+        answer = ""
+        from_to = ""
 
-        self.check_temp(-459)
+        if to_convert == "invalid":
+            set_feedback = "no"
+
+        # convert to celsius
+        elif min_val == -459:
+            # calculates
+            answer = (to_convert - 32) * 5 / 9
+            from_to = "{} F{} is {} C{}"
+
+        # convert to fahrenheit
+        else:
+            answer = to_convert * 1.8 + 32
+            from_to = "{} F{} is {} C{}"
+
+        if set_feedback == "yes":
+            to_convert = self.round_ans(to_convert)
+            answer = self.round_ans(answer)
+
+            # create user output and add to calc history
+            feedback = from_to.format(to_convert, degree_sign, answer, degree_sign)
+            self.var_feedback.set(feedback)
+
+            self.all_calculations.append(feedback)
+
+            # delete code below when history component is working!
+            print(self.all_calculations)
+
+        self.output_answer()
+
+    # checks temp is more than -273 and convert it
+
+    def output_answer(self):
+        output = self.var_feedback.get()
+        has_errors = self.var_has_error.get()
+
+        if has_errors == "yes":
+
+            self.output_label.config(fg="#9C0000")
+            self.temp_entry.config(bg="#F8CECC")
+
+        else:
+            self.output_label.config(fg="#004C00")
+            self.temp_entry.config(bg="#FFFFFF")
+
+        self.output_label.config(text=output)
 
 
 # main routine
