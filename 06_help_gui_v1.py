@@ -28,152 +28,49 @@ class Converter:
                                   )
         self.temp_heading.grid(row=0)
 
-        instructions = "Please enter a temperature below and " \
-                       "then press one of the buttons to convert " \
-                       "it from centigrade to Fahrenheit."
-        self.temp_instructions = Label(self.temp_frame,
-                                       text=instructions,
-                                       wrap=250, width=40,
-                                       justify="left")
-
-        self.temp_instructions.grid(row=1)
-
-        self.temp_entry = Entry(self.temp_frame,
-                                font=("Arial", "14")
-                                )
-        self.temp_entry.grid(row=2, padx=10, pady=10)
-
-        # error message
-        error = "please enter a number"
-        self.output_label = Label(self.temp_frame, text=error,
-                                  fg="#9C0000")
-        self.output_label.grid(row=3)
-
         # convert, help and history / export buttons
         self.button_frame = Frame(self.temp_frame)
         self.button_frame.grid(row=4)
-
-        self.to_celsius_button = Button(self.button_frame,
-                                        text="To Celsius",
-                                        bg="#990099",
-                                        fg=button_fg,
-                                        font=button_font, width=12,
-                                        command=lambda: self.temp_convert(-459))
-        self.to_celsius_button.grid(row=0, column=0, padx=5, pady=5)
-
-        self.to_fahrenheit_button = Button(self.button_frame,
-                                           text="To Fahrenheit",
-                                           bg="#009900",
-                                           fg=button_fg,
-                                           font=button_font, width=12,
-                                           command=lambda: self.temp_convert(-273))
-        self.to_fahrenheit_button.grid(row=0, column=1, padx=5, pady=5)
 
         self.to_help_button = Button(self.button_frame,
                                      text="Help / Info",
                                      bg="#CC6600",
                                      fg=button_fg,
-                                     font=button_font, width=12)
+                                     font=button_font, width=12,
+                                     command=self.to_help)
         self.to_help_button.grid(row=1, column=0, padx=5, pady=5)
 
-        self.to_history_button = Button(self.button_frame,
-                                        text="History / Export",
-                                        bg="#004C99",
-                                        fg=button_fg,
-                                        font=button_font, width=12,
-                                        state=DISABLED)
-        self.to_history_button.grid(row=1, column=1, padx=5, pady=5)
-
-    def check_temp(self, min_value):
-        has_error = "no"
-        error = "Please enter a number that is more " \
-                "than {}".format(min_value)
-
-        # checks user has entered valid number
-        response = self.temp_entry.get()
-        try:
-
-            response = float(response)
-
-            if response < min_value:
-                has_error = "yes"
-
-        except ValueError:
-            has_error = "yes"
-
-        # set var_has_error so that entry box and labels can be correctly formatted by forming function
-        if has_error == "yes":
-            self.var_has_error.set("yes")
-            self.var_feedback.set(error)
-            return "invalid"
-
-        # if there are no errors
-        else:
-
-            self.var_has_error.set("no")
-
-            # return number to be converted and enable history button
-            self.to_history_button.config(state=NORMAL)
-            return response
-
     @staticmethod
-    def round_ans(val):
-        var_rounded = (val * 2 + 1) // 2
-        return "{:.0f}".format(var_rounded)
+    def to_help():
+        DisplayHelp()
 
-    # checks that temp is more than -459 and converts
-    def temp_convert(self, min_val):
-        to_convert = self.check_temp(min_val)
-        degree_sign = u'\N{DEGREE SIGN}'
-        set_feedback = "yes"
-        answer = ""
-        from_to = ""
 
-        if to_convert == "invalid":
-            set_feedback = "no"
+class DisplayHelp:
 
-        # convert to celsius
-        elif min_val == -459:
-            # calculates
-            answer = (to_convert - 32) * 5 / 9
-            from_to = "{} F{} is {} C{}"
+    def __init__(self):
+        background = "#ffe6cc"
 
-        # convert to fahrenheit
-        else:
-            answer = to_convert * 1.8 + 32
-            from_to = "{} F{} is {} C{}"
+        self.help_box = Toplevel()
 
-        if set_feedback == "yes":
-            to_convert = self.round_ans(to_convert)
-            answer = self.round_ans(answer)
+        self.help_frame = Frame(self.help_box, width=300, height=200, bg=background)
 
-            # create user output and add to calc history
-            feedback = from_to.format(to_convert, degree_sign, answer, degree_sign)
-            self.var_feedback.set(feedback)
+        self.help_frame.grid()
 
-            self.all_calculations.append(feedback)
+        self.help_heading_label = Label(self.help_frame, bg=background, text="Help / Info", font=("Arial", "14", "bold"))
+        self.help_heading_label.grid(row=0)
 
-            # delete code below when history component is working!
-            print(self.all_calculations)
+        help_text = "To use the program, simply enter the temperature " \
+                    "you wish to convert and then choose to convert " \
+                    "to either degrees Celsius (centigrade) or " \
+                    "Fahrenheit..  \n\n" \
+                    " Note that -273 degrees C, you will get an error message. \n\n To see your calculation history " \
+                    "and export it to a text file, please click the 'History / Export' button."
+        self.help_text_label = Label(self.help_frame, bg=background, text=help_text, wrap=350, justify="left")
+        self.help_text_label.grid(row=1, padx=10)
 
-        self.output_answer()
-
-    # checks temp is more than -273 and convert it
-
-    def output_answer(self):
-        output = self.var_feedback.get()
-        has_errors = self.var_has_error.get()
-
-        if has_errors == "yes":
-
-            self.output_label.config(fg="#9C0000")
-            self.temp_entry.config(bg="#F8CECC")
-
-        else:
-            self.output_label.config(fg="#004C00")
-            self.temp_entry.config(bg="#FFFFFF")
-
-        self.output_label.config(text=output)
+        self.dismiss_button = Button(self.help_frame, font=("Arial", "12", "bold"),
+                                     text="Dismiss", bg="#CC6600", fg="#FFFFFF")
+        self.dismiss_button.grid(row=2, padx=10, pady=10)
 
 
 # main routine
