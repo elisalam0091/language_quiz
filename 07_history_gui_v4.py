@@ -12,11 +12,9 @@ class Converter:
         button_fg = "#FFFFFF"
 
         # Five item list
-        self.all_calculations = ['0 F° is -18°', '0 C° is 32 F°',
-                                 '30 F° is -1 C°', '30° C° is 86 F°',
-                                 '40 F° is 4 C°']
-
-        # six item list
+        self.all_calculations = ['0 C is 32 F', '100 C is 212 F', '40 C is 104 F', '-273 C is -459 F', '5 C is 41 F']
+        #
+        # # six item list
         # self.all_calculations = ['0 F° is -18°', '0 C° is 32 F°',
         # '30 F° is -1 C°', '30° C° is 86 F°',
         # '40 F° is 4 C°', '100 C° is 212 F°']
@@ -72,6 +70,11 @@ class HistoryExport:
 
         self.history_frame.grid()
 
+        self.history_heading_label = Label(self.history_frame,
+                                           text="History / Export",
+                                           font=("Arial", "14", "bold"))
+        self.history_heading_label.grid(row=0)
+
         self.dismiss_button = Button(self.history_frame,
                                      font=("Arial", "14", "bold"),
                                      text="Dismiss", bg="#666666",
@@ -79,11 +82,6 @@ class HistoryExport:
                                      command=partial(self.close_history, partner))
 
         self.dismiss_button.grid(row=2, padx=10, pady=10)
-
-        self.history_heading_label = Label(self.history_frame,
-                                           text="History / Export",
-                                           font=("Arial", "14", "bold"))
-        self.history_heading_label.grid(row=0)
 
         # customise text and background colour for calculation area
         # depending on whether all or only some calc are shown.
@@ -110,7 +108,7 @@ class HistoryExport:
 
         self.all_calcs_label = Label(self.history_frame,
                                      text=calc_string_text,
-                                     padx=10, pady=10, bg="#ffe6cc",
+                                     padx=10, pady=10, bg=calc_background,
                                      width=40, justify="left")
         self.all_calcs_label.grid(row=2)
 
